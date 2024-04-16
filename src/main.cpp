@@ -21,7 +21,7 @@ int main() {
     // ...
     Texture2D myTexture = LoadTexture("assets/graphics/testimage.png");
     RenderTexture2D canvas = LoadRenderTexture(Game::ScreenWidth, Game::ScreenHeight);
-    float renderScale{}; //those two are relevant to drawing and code-cleanliness
+    float renderScale{}; // this and the line below are relevant to drawing later.
     Rectangle renderRec{};
 
     // Main game loop
@@ -37,6 +37,7 @@ int main() {
             }
         }
         // Updates that are made by frame are coded here
+        // This is where YOUR logic code should go
         // ...
         // ...
 
@@ -44,24 +45,31 @@ int main() {
         // You can draw on the screen between BeginDrawing() and EndDrawing()
         // For the letterbox we draw on canvas instad
         BeginTextureMode(canvas);
-        { //Within this block is where we draw our app to the canvas.
+        { //Within this block is where we draw our app to the canvas and YOUR code goes.
             ClearBackground(WHITE);
             DrawText("Hello, world!", 10, 10, 30, LIGHTGRAY);
             DrawTexture(myTexture, 10, 100, WHITE);
         }
         EndTextureMode();
         //The following lines put the canvas in the middle of the window and have the negative as black
-        ClearBackground(BLACK);
-        renderScale = std::min(GetScreenHeight() /
-                               (float) canvas.texture.height, //Calculates how big or small the canvas has to be rendered.
-                               GetScreenWidth() / (float) canvas.texture.width);
+        ClearBackground(BLACK); // If you want something else than a black void in the background
+                                // then you can add stuff here.
+
+        renderScale = std::min(GetScreenHeight() / (float) canvas.texture.height, // Calculates how big or small the canvas has to be rendered.
+                               GetScreenWidth()  / (float) canvas.texture.width); // Priority is given to the smaller side.
+        renderScale = floorf(renderScale);
+        if (renderScale < 1) renderScale = 1; // Ensure that scale is at least 1.
         renderRec.width = canvas.texture.width * renderScale;
         renderRec.height = canvas.texture.height * renderScale;
         renderRec.x = (GetScreenWidth() - renderRec.width) / 2.0f;
         renderRec.y = (GetScreenHeight() - renderRec.height) / 2.0f;
-        DrawTexturePro(canvas.texture, Rectangle{0, 0, (float) canvas.texture.width, (float) -canvas.texture.height},
+        DrawTexturePro(canvas.texture,
+                       Rectangle{0, 0, (float) canvas.texture.width, (float) -canvas.texture.height},
                        renderRec,
                        {}, 0, WHITE);
+        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_S)) {
+            DrawText(TextFormat("Render scale: %.0f", renderScale), 10, 10, 20, LIGHTGRAY);
+        }
         EndDrawing();
     } // Main game loop end
 
