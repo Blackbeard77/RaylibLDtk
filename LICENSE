@@ -10,7 +10,12 @@ Copyright (c) Ramon Santamaria (@raysan5) and the raylib development team
 [3] https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 Copyright (c) GitHub and the GitHub's gitignore repository development team
 
-Assets - Monochrome Pirates (1.0) 'Kenney' - (www.kenney.nl)
+[4]JSON for Modern C++
+https://github.com/nlohmann/json
+Copyright (c) 2013–2025 Niels Lohmann
+
+[5]Assets - Monochrome Pirates (1.0) by 'Kenney'
+Website: https://kenney.nl
 
 The raylib project template is licenced under the zlib license:
 
