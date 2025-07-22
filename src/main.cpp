@@ -145,7 +145,7 @@ int main() {
                         16
                 };
                 if (isPlayerMoving) {
-                    src.y = 16 * (((int) (GetTime() * 15)) % 3);
+                    src.y = 16 * (((int) (GetTime() * 10)) % 4);
                 }
                 DrawTextureRec(player, src, dest, WHITE); // Draw the player texture at the player's position
             }
