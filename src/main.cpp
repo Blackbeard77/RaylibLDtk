@@ -7,6 +7,13 @@
 #include "config.h"
 #include "fstream"
 
+enum direction {
+    SOUTH = 0,
+    WEST = 1,
+    NORTH = 2,
+    EAST = 3
+};
+
 int main() {
     // [RAYLIB INITIALIZATION]
     // Project name, screen size, fullscreen mode etc. can be specified in the config.h.in file
@@ -19,7 +26,8 @@ int main() {
 #endif
 
     // [YOUR GAME INITIALISATION]
-    Texture2D tileset = LoadTexture("assets/graphics/tilesets/pirates.png"); // Load a Tileset for the LDtk example.
+    Texture2D player = LoadTexture("assets/graphics/test_character.png");
+    Texture2D tileset = LoadTexture("assets/graphics/tilesets/pirates.png");
     RenderTexture2D canvas = LoadRenderTexture(Game::ScreenWidth,
                                                Game::ScreenHeight); // Create a render texture to draw on.
 
@@ -34,13 +42,12 @@ int main() {
     };
 
 
-    // Player Example
+    // [PLAYER INIT]
+    // Try: Make the player its own struct or class.
     Vector2 playerPosition = {620, 380}; // Set the initial player position
+    direction playerDirection = SOUTH;
     const float playerSpeed = 1.0f;
-    const float playerRadius = 8.0f;
-
-    // Load the LDtk level file
-    std::ifstream filestream("LDtk/MyLDtkProject/Level_0.ldtkl");
+    bool isPlayerMoving = false;
 
     // Create a JSON object to hold the level data
     nlohmann::json level;
@@ -68,22 +75,39 @@ int main() {
         // This is where YOUR logic code should go
 
         // [PLAYER MOVEMENT - INPUTS]
-        if (IsKeyDown(KEY_W)) playerPosition.y -= playerSpeed;
-        if (IsKeyDown(KEY_S)) playerPosition.y += playerSpeed;
-        if (IsKeyDown(KEY_A)) playerPosition.x -= playerSpeed;
-        if (IsKeyDown(KEY_D)) playerPosition.x += playerSpeed;
+        isPlayerMoving = false;
+        if (IsKeyDown(KEY_W)) {
+            playerPosition.y -= playerSpeed;
+            playerDirection = NORTH;
+            isPlayerMoving = true;
+        }
+        if (IsKeyDown(KEY_S)) {
+            playerPosition.y += playerSpeed;
+            playerDirection = SOUTH;
+            isPlayerMoving = true;
+        }
+        if (IsKeyDown(KEY_A)) {
+            playerPosition.x -= playerSpeed;
+            playerDirection = WEST;
+            isPlayerMoving = true;
+        }
+        if (IsKeyDown(KEY_D)) {
+            playerPosition.x += playerSpeed;
+            playerDirection = EAST;
+            isPlayerMoving = true;
+        }
 
         // [CAMERA LOGIC]
         // This here are some basic camera controls to play around with.
         playerCam.target = playerPosition;
-        if (IsKeyDown(KEY_R)){
+        if (IsKeyDown(KEY_R)) {
             playerCam.rotation = GetTime() * 10; // Example rotation based on time, you can change this to your needs.
-        }else{
+        } else {
             playerCam.rotation = 0; // Reset rotation when R is not pressed
         }
         if (IsKeyDown(KEY_Z)) {
             playerCam.zoom = 2.0f;
-        }else {
+        } else {
             playerCam.zoom = 1.0f;
         }
 
@@ -147,7 +171,19 @@ int main() {
                 } // You should draw the level separately within its own class or function.
 
                 // [DRAW PLAYER]
-                DrawCircleV(playerPosition, playerRadius, RED);
+                Vector2 dest = playerPosition;
+                dest.x -= 8;
+                dest.y -= 16;
+                Rectangle src = {
+                        (float) playerDirection * 16,
+                        0,
+                        16,
+                        16
+                };
+                if (isPlayerMoving) {
+                    src.y = 16 * (((int) (GetTime() * 15)) % 3);
+                }
+                DrawTextureRec(player, src, dest, WHITE); // Draw the player texture at the player's position
             }
             EndMode2D();
 
@@ -155,6 +191,7 @@ int main() {
             // This is probably where you want to draw the HUD
             // As an example, we draw the players position.
             DrawText(TextFormat("X: %.0f \nY: %.0f", playerPosition.x, playerPosition.y), 10, 10, 10, BLACK);
+            DrawFPS(10, 30); // Draw the FPS counter in the top left corner
         }
         EndTextureMode(); // End of the canvas drawing block
 
