@@ -14,8 +14,11 @@ Copyright (c) GitHub and the GitHub's gitignore repository development team
 https://github.com/nlohmann/json
 Copyright (c) 2013–2025 Niels Lohmann
 
-[5]Assets - Monochrome Pirates (1.0) by 'Kenney'
+[5]Assets by 'Kenney'
 Website: https://kenney.nl
+Used packs:
+Monochrome Pirates (1.0) for the world
+RPG Urban Pack (1.0) for the player character
 
 The raylib project template is licenced under the zlib license:
 
