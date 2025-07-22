@@ -6,6 +6,7 @@
 #include "nlohmann/json.hpp"
 #include "config.h"
 #include "fstream"
+#include "Level/Level.h"
 
 enum direction {
     SOUTH = 0,
@@ -49,12 +50,11 @@ int main() {
     const float playerSpeed = 1.0f;
     bool isPlayerMoving = false;
 
-    // Create a JSON object to hold the level data
-    nlohmann::json level;
-
-    // Load the JSON content from the file
-    filestream >> level; // This implementation just keeps the level data in a json object.
-    // It's recommended to create a native class for levels later down the line.
+    // [LEVEL LOADING]
+    std::ifstream levelFilestram("LDtk/MyLDtkProject/Level_0.ldtkl");
+    nlohmann::json levelJson; // Create a JSON object to hold the levelJson data
+    levelFilestram >> levelJson; // Load the JSON content from the file
+    Level level(levelJson);
 
     // [MAIN GAME LOOP]
     while (!WindowShouldClose()) // Detect window close button or ESC key
@@ -131,44 +131,8 @@ int main() {
                         500
                 }; // This rectangle defines the area of the camera view for primitive culling.
                 // It is slightly too small to ensure you can see its edges by default.
-                for (int i = level["layerInstances"].size() - 1; i >= 0; --i) {
-                    //This iterates through the layers backwards.
-                    auto layer = level["layerInstances"][i];
 
-                    for (auto tile: layer["autoLayerTiles"]) {
-                        Vector2 dest;
-                        dest.x = tile["px"][0];
-                        dest.y = tile["px"][1];
-                        if (!CheckCollisionPointRec(dest, cameraSpace)) continue; // Skip tiles outside the camera view
-                        Rectangle src = {
-                                tile["src"][0],
-                                tile["src"][1],
-                                16,
-                                16
-                        };
-                        DrawTextureRec(tileset, src, dest, WHITE);
-                    }
-
-                    for (auto tile: layer["gridTiles"]) {
-                        Vector2 dest;
-                        dest.x = tile["px"][0];
-                        dest.y = tile["px"][1];
-                        Rectangle tileSpace = {
-                                dest.x,
-                                dest.y,
-                                16,
-                                16
-                        }; // This is the rectangle of the tile.
-                        if (!CheckCollisionRecs(tileSpace, cameraSpace)) continue;
-                        Rectangle src = {
-                                tile["src"][0],
-                                tile["src"][1],
-                                16,
-                                16
-                        };
-                        DrawTextureRec(tileset, src, dest, WHITE);
-                    }
-                } // You should draw the level separately within its own class or function.
+                level.draw(tileset, cameraSpace);
 
                 // [DRAW PLAYER]
                 Vector2 dest = playerPosition;
